@@ -37,6 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'rest_framework',
+
+    'administrator.apps.AdministratorConfig',
+    'general_user.apps.GeneralUserConfig',
+    'hospital.apps.HospitalConfig',
+    'public_place.apps.PublicPlaceConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -121,3 +129,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Custom settings
+AUTH_USER_MODEL = 'general_user.User'
