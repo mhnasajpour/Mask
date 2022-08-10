@@ -37,13 +37,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'rest_framework',
+    'django.contrib.sites',
 
     'administrator.apps.AdministratorConfig',
     'general_user.apps.GeneralUserConfig',
     'hospital.apps.HospitalConfig',
     'public_place.apps.PublicPlaceConfig',
+
+    'rest_framework',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'allauth',
+    'allauth.account',
+    'dj_rest_auth.registration',
 
 ]
 
@@ -133,3 +139,49 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom settings
 AUTH_USER_MODEL = 'general_user.User'
+
+# Authentication
+SITE_ID = 1
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
+
+LOGIN_URL = 'http://localhost:8000/auth/login/'
+ACCOUNT_LOGOUT_ON_GET = True
+
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'access'
+JWT_AUTH_REFRESH_COOKIE = 'refresh'
+
+OLD_PASSWORD_FIELD_ENABLED = True
+
+AUTHENTICATION_BACKENDS = [
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'general_user.serializers.CustomLoginSerializer',
+    'USER_DETAILS_SERIALIZER': 'general_user.serializers.UserDetailsSerializer',
+    'PASSWORD_RESET_SERIALIZER': 'general_user.serializers.CustomPasswordResetSerializer',
+}
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'general_user.serializers.CustomRegisterSerializer',
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    ),
+}
+
+
+GENERAL_USER = 'U'
+BUSINESS_USER = 'B'
+ADMIN_USER = 'A'

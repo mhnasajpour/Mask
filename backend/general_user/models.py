@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from config.settings import GENERAL_USER, BUSINESS_USER, ADMIN_USER
 
 
 USER_STATUS_CHOICES = (
@@ -12,11 +13,20 @@ USER_STATUS_CHOICES = (
 
 
 class User(AbstractUser):
-    national_code = models.CharField(max_length=10, unique=True)
+    national_code = models.CharField(max_length=10)
     phone_number = models.CharField(max_length=11, blank=True)
 
+    @property
+    def type(self):
+        if hasattr(self, 'generaluser'):
+            return GENERAL_USER
+        if hasattr(self, 'publicplace'):
+            return BUSINESS_USER
+        if hasattr(self, 'administrator'):
+            return ADMIN_USER
 
-class GeneralUser(User):
+
+class GeneralUser(models.Model):
     BLOOD_TYPE_CHOICES = (
         ('A+', 'A+'), ('A-', 'A-'),
         ('B+', 'B+'), ('B-', 'B-'),
@@ -24,6 +34,7 @@ class GeneralUser(User):
         ('AB+', 'AB+'), ('AB-', 'AB-')
     )
 
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     birth_date = models.DateField(null=True)
     blood_type = models.CharField(
         max_length=3, choices=BLOOD_TYPE_CHOICES, null=True)
