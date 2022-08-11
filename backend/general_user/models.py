@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from config.settings import GENERAL_USER, BUSINESS_USER, ADMIN_USER
+from config.settings import GENERAL_USER, BUSINESS_USER
 
 
 USER_STATUS_CHOICES = (
@@ -22,8 +22,6 @@ class User(AbstractUser):
             return GENERAL_USER
         if hasattr(self, 'publicplace'):
             return BUSINESS_USER
-        if hasattr(self, 'administrator'):
-            return ADMIN_USER
 
 
 class GeneralUser(models.Model):

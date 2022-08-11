@@ -62,7 +62,7 @@ class CustomPasswordResetSerializer(PasswordResetSerializer):
 class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('pk', 'type', 'first_name', 'last_name',
+        fields = ('pk', 'type', 'is_staff', 'first_name', 'last_name',
                   'username', 'email', 'national_code', 'phone_number')
 
         read_only_fields = ('pk', 'email')

@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
-    'administrator.apps.AdministratorConfig',
     'general_user.apps.GeneralUserConfig',
     'hospital.apps.HospitalConfig',
     'public_place.apps.PublicPlaceConfig',
@@ -184,4 +183,3 @@ REST_FRAMEWORK = {
 
 GENERAL_USER = 'U'
 BUSINESS_USER = 'B'
-ADMIN_USER = 'A'
