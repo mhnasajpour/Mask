@@ -1,4 +1,3 @@
-from .views import Hospital
 from django.urls import path
 from .views import ListCreateHospitalView, RetrieveUpdateDestroyHospitalView
 

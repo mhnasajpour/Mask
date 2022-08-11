@@ -1,6 +1,7 @@
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
-from .serializers import GeneralUserSerializer, PublicPlaceSerializer
+from .serializers import GeneralUserSerializer
+from public_place.serializers import PublicPlaceSerializer
 
 
 class CustomUserDetailsView(RetrieveUpdateAPIView):

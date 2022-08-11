@@ -74,11 +74,3 @@ class GeneralUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = GeneralUser
         fields = ('user', 'birth_date', 'blood_type', 'height', 'weight')
-
-
-class PublicPlaceSerializer(serializers.ModelSerializer):
-    user = UserDetailsSerializer()
-
-    class Meta:
-        model = PublicPlace
-        fields = ('user', 'name', 'location', 'region')

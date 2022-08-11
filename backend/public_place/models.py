@@ -1,11 +1,11 @@
-from pyexpat import model
 from django.db import models
 from general_user.models import User, GeneralUser, USER_STATUS_CHOICES
+from config.settings import WHITEPLACE, REDPLACE
 
 
 PLACE_STATUS_CHOICES = (
-    ('W', 'White'),
-    ('R', 'Red'),
+    (WHITEPLACE, 'White'),
+    (REDPLACE, 'Red'),
 )
 
 
@@ -16,6 +16,13 @@ class PublicPlace(models.Model):
     region = models.PositiveSmallIntegerField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
+
+    @property
+    def status(self):
+        try:
+            return self.placestatus_set.last().status
+        except AttributeError:
+            return WHITEPLACE
 
 
 class PlaceStatus(models.Model):
