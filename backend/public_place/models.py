@@ -1,6 +1,6 @@
 from pyexpat import model
 from django.db import models
-from general_user.models import User, USER_STATUS_CHOICES
+from general_user.models import User, GeneralUser, USER_STATUS_CHOICES
 
 
 PLACE_STATUS_CHOICES = (
@@ -25,7 +25,7 @@ class PlaceStatus(models.Model):
 
 
 class MeetPlace(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(GeneralUser, on_delete=models.SET_NULL, null=True)
     place = models.ForeignKey(
         PublicPlace, on_delete=models.SET_NULL, null=True)
     status_user = models.PositiveSmallIntegerField(choices=USER_STATUS_CHOICES)
