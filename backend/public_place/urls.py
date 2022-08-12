@@ -2,6 +2,7 @@ from django.urls import path
 from .views import ChangePlaceStatusView, MeetPlaceStatisticsView
 
 urlpatterns = [
-    path('status/', ChangePlaceStatusView.as_view()),
-    path('statistics/<int:day>', MeetPlaceStatisticsView.as_view()),
+    path('status/', ChangePlaceStatusView.as_view(), name='change_status'),
+    path('statistics/<int:day>',
+         MeetPlaceStatisticsView.as_view(), name='meet_statistics'),
 ]

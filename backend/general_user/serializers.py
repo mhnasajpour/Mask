@@ -45,3 +45,11 @@ class GeneralUserSerializer(AbstractUserDetailsSerializer):
         instance.weight = data.get('weight', instance.weight)
         instance.save()
         return instance
+
+
+class RecordLatestHealthStatusSerializer(serializers.Serializer):
+    cough = serializers.BooleanField(default=False)
+    fever = serializers.BooleanField(default=False)
+    asthma = serializers.BooleanField(default=False)
+    pain = serializers.BooleanField(default=False)
+    sore_throat = serializers.BooleanField(default=False)
