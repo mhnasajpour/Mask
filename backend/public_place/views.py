@@ -27,7 +27,7 @@ class ChangePlaceStatusView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ListMeetPlaceView(APIView):
+class MeetPlaceStatisticsView(APIView):
     permission_classes = [IsQualified, IsPublicPlace]
 
     def get(self, request, day):
