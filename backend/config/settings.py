@@ -173,13 +173,13 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 REST_AUTH_SERIALIZERS = {
-    'LOGIN_SERIALIZER': 'general_user.serializers.CustomLoginSerializer',
-    'USER_DETAILS_SERIALIZER': 'general_user.serializers.UserDetailsSerializer',
-    'PASSWORD_RESET_SERIALIZER': 'general_user.serializers.CustomPasswordResetSerializer',
+    'LOGIN_SERIALIZER': 'general_user.auth_serializers.CustomLoginSerializer',
+    'USER_DETAILS_SERIALIZER': 'general_user.auth_serializers.UserDetailsSerializer',
+    'PASSWORD_RESET_SERIALIZER': 'general_user.auth_serializers.CustomPasswordResetSerializer',
 }
 
 REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'general_user.serializers.CustomRegisterSerializer',
+    'REGISTER_SERIALIZER': 'general_user.auth_serializers.CustomRegisterSerializer',
 }
 
 REST_FRAMEWORK = {

@@ -42,6 +42,13 @@ class GeneralUser(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
+    @property
+    def status(self):
+        try:
+            return self.userstatus_set.last().status
+        except AttributeError:
+            return 1
+
 
 class UserStatus(models.Model):
     user = models.ForeignKey(GeneralUser, on_delete=models.CASCADE)

@@ -4,7 +4,7 @@ from .serializers import GeneralUserSerializer
 from public_place.serializers import PublicPlaceSerializer
 
 
-class CustomUserDetailsView(RetrieveUpdateAPIView):
+class UserDetailsView(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):

@@ -1,14 +1,25 @@
 from rest_framework import serializers
 from .models import PublicPlace, PLACE_STATUS_CHOICES
-from general_user.serializers import UserDetailsSerializer
+from general_user.serializers import AbstractUserDetailsSerializer
 
 
-class PublicPlaceSerializer(serializers.ModelSerializer):
-    user = UserDetailsSerializer()
+class PublicPlaceSerializer(AbstractUserDetailsSerializer):
+    name = serializers.CharField(max_length=255, required=True)
+    location = serializers.CharField(max_length=255, required=True)
+    region = serializers.IntegerField(min_value=0, required=True)
 
     class Meta:
         model = PublicPlace
-        fields = ('user', 'status', 'name', 'location', 'region')
+        fields = ('pk', 'type', 'is_staff', 'status', 'first_name', 'last_name', 'username', 'email',
+                  'national_code', 'phone_number', 'name', 'location', 'region')
+
+    def update(self, instance, data):
+        self.update_user(instance=instance.user, data=data['user'])
+        instance.name = data.get('name', instance.name)
+        instance.location = data.get('location', instance.location)
+        instance.region = data.get('region', instance.region)
+        instance.save()
+        return instance
 
 
 class PlaceStatusSerializer(serializers.Serializer):
