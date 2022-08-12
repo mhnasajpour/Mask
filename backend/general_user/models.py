@@ -12,6 +12,14 @@ USER_STATUS_CHOICES = (
 )
 
 
+BLOOD_TYPE_CHOICES = (
+    ('A+', 'A+'), ('A-', 'A-'),
+    ('B+', 'B+'), ('B-', 'B-'),
+    ('O+', 'O+'), ('O-', 'O-'),
+    ('AB+', 'AB+'), ('AB-', 'AB-')
+)
+
+
 class User(AbstractUser):
     national_code = models.CharField(max_length=10)
     phone_number = models.CharField(max_length=11, blank=True)
@@ -25,13 +33,6 @@ class User(AbstractUser):
 
 
 class GeneralUser(models.Model):
-    BLOOD_TYPE_CHOICES = (
-        ('A+', 'A+'), ('A-', 'A-'),
-        ('B+', 'B+'), ('B-', 'B-'),
-        ('O+', 'O+'), ('O-', 'O-'),
-        ('AB+', 'AB+'), ('AB-', 'AB-')
-    )
-
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     birth_date = models.DateField(null=True)
     blood_type = models.CharField(

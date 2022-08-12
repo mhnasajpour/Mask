@@ -1,6 +1,5 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from general_user.permissions import IsAdminOrReadOnly
-from rest_framework.generics import ListCreateAPIView
 from .serializers import HospitalSerializer
 from .models import Hospital
 

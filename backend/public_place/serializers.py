@@ -1,7 +1,6 @@
 from rest_framework import serializers
-from .models import PublicPlace
+from .models import PublicPlace, PLACE_STATUS_CHOICES
 from general_user.serializers import UserDetailsSerializer
-from .models import PLACE_STATUS_CHOICES
 
 
 class PublicPlaceSerializer(serializers.ModelSerializer):
