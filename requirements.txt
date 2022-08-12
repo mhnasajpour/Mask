@@ -8,9 +8,12 @@ defusedxml==0.7.1
 dj-rest-auth==2.2.5
 Django==4.1
 django-allauth==0.51.0
+django-environ==0.9.0
 djangorestframework==3.13.1
+djangorestframework-simplejwt==5.2.0
 idna==3.3
 oauthlib==3.2.0
+psycopg2-binary==2.9.3
 pycodestyle==2.9.1
 pycparser==2.21
 PyJWT==2.4.0
