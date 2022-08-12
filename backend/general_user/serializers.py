@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import GeneralUser
+from .models import GeneralUser, UserStatus
 
 
 class AbstractUserDetailsSerializer(serializers.ModelSerializer):
@@ -53,3 +53,12 @@ class RecordLatestHealthStatusSerializer(serializers.Serializer):
     asthma = serializers.BooleanField(default=False)
     pain = serializers.BooleanField(default=False)
     sore_throat = serializers.BooleanField(default=False)
+
+
+class ListUserStatusSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(
+        source='date_created', read_only=True, format='%Y-%m-%d')
+
+    class Meta:
+        model = UserStatus
+        fields = ('status', 'date')
