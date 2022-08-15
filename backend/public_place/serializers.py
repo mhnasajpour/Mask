@@ -24,3 +24,11 @@ class PublicPlaceSerializer(AbstractUserDetailsSerializer):
 
 class ChangePlaceStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=PLACE_STATUS_CHOICES)
+
+
+class MinorPlaceDetailsSerializer(serializers.ModelSerializer):
+    email = serializers.ReadOnlyField(source='user.email')
+
+    class Meta:
+        model = PublicPlace
+        fields = ('pk', 'status', 'email', 'name', 'location', 'region')

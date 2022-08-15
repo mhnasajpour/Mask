@@ -1,9 +1,10 @@
 from rest_framework.views import APIView
 from general_user.permissions import IsQualified, IsPublicPlace
+from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import ChangePlaceStatusSerializer
-from .models import PlaceStatus
+from .serializers import ChangePlaceStatusSerializer, MinorPlaceDetailsSerializer
+from .models import PublicPlace, PlaceStatus
 from datetime import datetime, timedelta
 from config.settings import REDPLACE
 
@@ -16,6 +17,11 @@ def meetings_place(user):
 
         for place in places:
             PlaceStatus.objects.create(place=place, status=REDPLACE)
+
+
+class MinorPlaceDetailsView(ListAPIView):
+    serializer_class = MinorPlaceDetailsSerializer
+    queryset = PublicPlace.objects.all()
 
 
 class ChangePlaceStatusView(APIView):
