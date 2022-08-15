@@ -35,6 +35,4 @@ class MeetPlace(models.Model):
     user = models.ForeignKey(GeneralUser, on_delete=models.SET_NULL, null=True)
     place = models.ForeignKey(
         PublicPlace, on_delete=models.SET_NULL, null=True)
-    status_user = models.PositiveSmallIntegerField(choices=USER_STATUS_CHOICES)
-    status_place = models.CharField(max_length=1, choices=PLACE_STATUS_CHOICES)
     date_created = models.DateTimeField(auto_now_add=True)
