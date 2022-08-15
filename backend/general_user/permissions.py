@@ -4,7 +4,7 @@ from config.settings import GENERAL_USER, BUSINESS_USER
 
 class IsQualified(BasePermission):
     def has_permission(self, request, view):
-        return bool(request.user.is_authenticated and request.user.first_name)
+        return bool(request.user.is_authenticated and request.user.first_name and request.user.last_name)
 
 
 class IsGeneralUser(BasePermission):
