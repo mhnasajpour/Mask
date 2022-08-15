@@ -1,6 +1,7 @@
 from django.db import models
-from general_user.models import User, GeneralUser, USER_STATUS_CHOICES
+from general_user.models import User, GeneralUser
 from config.settings import WHITEPLACE, REDPLACE
+import uuid
 
 
 PLACE_STATUS_CHOICES = (
@@ -10,6 +11,7 @@ PLACE_STATUS_CHOICES = (
 
 
 class PublicPlace(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, models.CASCADE)
     name = models.CharField(max_length=255, blank=True)
     location = models.CharField(max_length=255, blank=True)
