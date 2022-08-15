@@ -115,7 +115,7 @@ class ListCreateMeetPeopleView(ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user.generaluser
         return MeetPeople.objects.filter(Q(user1=user) | Q(user2=user)) \
-            .filter(date_created__gt=datetime.now()-timedelta(days=self.request.GET.get('day', 1)))[::-1]
+            .filter(date_created__gt=datetime.now()-timedelta(days=int(self.request.GET.get('day', 1))))[::-1]
 
     def post(self, request):
         serializer = ListCreateMeetPeopleserializers(data=request.data)
