@@ -42,6 +42,9 @@ class GeneralUser(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f'{self.user.first_name} {self.user.last_name}'
+
     @property
     def status(self):
         try:
@@ -53,6 +56,7 @@ class GeneralUser(models.Model):
 class UserStatus(models.Model):
     user = models.ForeignKey(GeneralUser, on_delete=models.CASCADE)
     status = models.PositiveSmallIntegerField(choices=USER_STATUS_CHOICES)
+    effective_factor = models.IntegerField()
     date_created = models.DateTimeField(auto_now_add=True)
 
 
@@ -61,8 +65,4 @@ class MeetPeople(models.Model):
         GeneralUser, on_delete=models.SET_NULL, related_name='meet_people1', null=True)
     user2 = models.ForeignKey(
         GeneralUser, on_delete=models.SET_NULL, related_name='meet_people2', null=True)
-    status_user1 = models.PositiveSmallIntegerField(
-        choices=USER_STATUS_CHOICES)
-    status_user2 = models.PositiveSmallIntegerField(
-        choices=USER_STATUS_CHOICES)
     date_created = models.DateTimeField(auto_now_add=True)
