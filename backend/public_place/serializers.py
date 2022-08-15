@@ -22,5 +22,5 @@ class PublicPlaceSerializer(AbstractUserDetailsSerializer):
         return instance
 
 
-class PlaceStatusSerializer(serializers.Serializer):
+class ChangePlaceStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=PLACE_STATUS_CHOICES)
