@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import GeneralUser, UserStatus
+from .models import GeneralUser, UserStatus, MeetPeople
+from datetime import timedelta
 
 
 class AbstractUserDetailsSerializer(serializers.ModelSerializer):
@@ -26,7 +27,7 @@ class AbstractUserDetailsSerializer(serializers.ModelSerializer):
         return instance
 
     def validate_phone_number(self, phone_number):
-        if len(phone_number) == 11 and phone_number[:2] == '09':
+        if len(phone_number) == 11 and phone_number[:2] == '09' and phone_number.isnumeric():
             return phone_number
         raise serializers.ValidationError('Phone number is invalid.')
 
@@ -55,10 +56,62 @@ class RecordLatestHealthStatusSerializer(serializers.Serializer):
     sore_throat = serializers.BooleanField(default=False)
 
 
+class MinorUserDetailsSerializer(serializers.ModelSerializer):
+    first_name = serializers.ReadOnlyField(source='user.first_name')
+    last_name = serializers.ReadOnlyField(source='user.last_name')
+    email = serializers.ReadOnlyField(source='user.email')
+
+    class Meta:
+        model = GeneralUser
+        fields = ('first_name', 'last_name', 'email', 'status')
+
+
 class ListUserStatusSerializer(serializers.ModelSerializer):
     date = serializers.DateTimeField(
         source='date_created', read_only=True, format='%Y-%m-%d')
+    factor = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = UserStatus
-        fields = ('status', 'date')
+        fields = ('factor', 'status', 'date')
+
+    def get_factor(self, obj):
+        if obj.effective_factor == -1:
+            return 'Got better'
+        if obj.effective_factor == 0:
+            return 'Test'
+        return MinorUserDetailsSerializer(obj.user).data
+
+
+class ListCreateMeetPeopleserializers(serializers.ModelSerializer):
+    user_1 = MinorUserDetailsSerializer(read_only=True, source='user1')
+    user_2 = MinorUserDetailsSerializer(read_only=True, source='user2')
+    status_user1 = serializers.SerializerMethodField(read_only=True)
+    status_user2 = serializers.SerializerMethodField(read_only=True)
+    date = serializers.DateTimeField(
+        source='date_created', format='%Y-%m-%d', read_only=True)
+
+    user = serializers.IntegerField(required=False, min_value=1)
+
+    class Meta:
+        model = MeetPeople
+        fields = ('user', 'user_1', 'user_2',
+                  'status_user1', 'status_user2', 'date')
+
+    def get_status_user1(self, obj):
+        try:
+            return obj.user1.userstatus_set \
+                .filter(date_created__gte=obj.date_created,
+                        date_created__lte=obj.date_created + timedelta(days=7)) \
+                .last().status
+        except:
+            return 1
+
+    def get_status_user2(self, obj):
+        try:
+            return obj.user2.userstatus_set \
+                .filter(date_created__gte=obj.date_created,
+                        date_created__lte=obj.date_created + timedelta(days=7)) \
+                .last().status
+        except:
+            return 1
