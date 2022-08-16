@@ -1,3 +1,4 @@
+from asyncore import write
 from rest_framework import serializers
 
 from public_place.models import PublicPlace
@@ -149,10 +150,23 @@ class ListUserSerializer(MinorUserDetailsSerializer):
     class Meta:
         model = GeneralUser
         fields = ('pk', 'first_name', 'last_name',
-                  'national_code', 'email', 'date')
+                  'national_code', 'email', 'status', 'date')
 
     def get_date(self, obj):
         try:
             return obj.userstatus_set.last().date_created.date()
         except:
             return None
+
+
+class ControlPatientsSerializer(ListUserSerializer):
+    STATUS_CHOICES = (
+        (2, 'Got better'),
+        (5, 'pass away')
+    )
+    status = serializers.ChoiceField(choices=STATUS_CHOICES)
+
+    class Meta:
+        model = GeneralUser
+        fields = ('pk', 'first_name', 'last_name',
+                  'national_code', 'email', 'date', 'status')
