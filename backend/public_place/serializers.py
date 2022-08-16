@@ -12,7 +12,7 @@ class MinorPlaceDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PublicPlace
-        fields = ('pk', 'status', 'email', 'name', 'location', 'region')
+        fields = ('pk', 'email', 'name', 'location', 'region')
 
 
 class ListCreateMeetPlaceSerializer(serializers.ModelSerializer):
