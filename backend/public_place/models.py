@@ -28,8 +28,17 @@ class PublicPlace(models.Model):
 
 
 class PlaceStatus(models.Model):
+    TYPE_CHOICES = (
+        (1, 'Meet'),
+        (2, 'Disinfect'),
+        (3, 'Passing time'),
+        (4, 'Manually turned red')
+    )
+
+    type = models.IntegerField(choices=TYPE_CHOICES)
     place = models.ForeignKey(PublicPlace, on_delete=models.CASCADE)
     status = models.CharField(max_length=1, choices=PLACE_STATUS_CHOICES)
+    effective_factor = models.CharField(max_length=50, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
 
 
