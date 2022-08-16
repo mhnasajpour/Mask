@@ -1,6 +1,7 @@
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
-from .serializers import GeneralUserSerializer, PublicPlaceSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers
+
+from .serializers import GeneralUserSerializer, PublicPlaceSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers, MinorUserDetailsSerializer
 from rest_framework.views import APIView
 from .permissions import IsQualified, IsGeneralUser
 from rest_framework.response import Response
@@ -58,6 +59,12 @@ class UserDetailsView(RetrieveUpdateAPIView):
             return self.request.user.generaluser
         if hasattr(self.request.user, 'publicplace'):
             return self.request.user.publicplace
+
+
+class MinorPlaceDetailsView(ListAPIView):
+    serializer_class = MinorUserDetailsSerializer
+    queryset = GeneralUser.objects.filter(
+        ~Q(user__first_name='') | ~Q(user__last_name=''))
 
 
 class RecordLatestHealthStatusView(APIView):
