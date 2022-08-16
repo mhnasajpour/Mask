@@ -1,7 +1,6 @@
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
-from .serializers import GeneralUserSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers
-from public_place.serializers import PublicPlaceSerializer
+from .serializers import GeneralUserSerializer, PublicPlaceSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers
 from rest_framework.views import APIView
 from .permissions import IsQualified, IsGeneralUser
 from rest_framework.response import Response
@@ -20,7 +19,7 @@ def update_status(user):
     if 1 < user_status.status < 4 and level:
         new_status = user_status.status-level
         UserStatus.objects.create(
-            user=user, effective_factor=-1, status=new_status if new_status > 0 else 1)
+            type=4, user=user, status=new_status if new_status > 0 else 1)
 
 
 def meetings_people(user):
@@ -41,7 +40,7 @@ def meetings_people(user):
         for person in persons1 + persons2:
             if GeneralUser.objects.get(pk=person).status < user.status:
                 UserStatus.objects.create(
-                    user_id=person, effective_factor=user.pk, status=user.status-1)
+                    type=2, user_id=person, effective_factor=user.pk, status=user.status-1)
                 meetings_people(GeneralUser.objects.get(pk=person))
 
 
@@ -66,8 +65,9 @@ class RecordLatestHealthStatusView(APIView):
     serializer_class = RecordLatestHealthStatusSerializer
 
     def post(self, request):
-        last_status = request.user.generaluser.userstatus_set.last()
-        if last_status and not last_status.effective_factor and not datetime.now().date() - last_status.date_created.date():
+        last_status = request.user.generaluser.userstatus_set \
+            .filter(type=1).last()
+        if last_status and not datetime.now().date() - last_status.date_created.date():
             return Response({'message': 'You can only test once a day.'},
                             status=status.HTTP_403_FORBIDDEN)
 
@@ -92,7 +92,7 @@ class RecordLatestHealthStatusView(APIView):
         with transaction.atomic():
             if request.user.generaluser.status <= health_status:
                 UserStatus.objects.create(
-                    user=request.user.generaluser, effective_factor=0, status=health_status)
+                    type=1, user=request.user.generaluser, status=health_status)
                 meetings_people(request.user.generaluser)
                 return Response({'status': request.user.generaluser.status}, status=status.HTTP_201_CREATED)
 
@@ -114,16 +114,17 @@ class ListCreateMeetPeopleView(ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user.generaluser
-        return MeetPeople.objects.filter(Q(user1=user) | Q(user2=user)) \
-            .filter(date_created__gt=datetime.now()-timedelta(days=int(self.request.GET.get('day', 1))))[::-1]
+        return MeetPeople.objects.filter(Q(user1=user) | Q(user2=user)).filter(
+            date_created__gt=datetime.now()-timedelta(days=int(self.request.GET.get('day', 1))))[::-1]
 
     def post(self, request):
         serializer = ListCreateMeetPeopleserializers(data=request.data)
         serializer.is_valid(raise_exception=True)
         user_target = GeneralUser.objects.get(user=serializer.data['user'])
 
-        if self.get_queryset():
-            meetings = [(obj.user1, obj.user2) for obj in self.get_queryset()]
+        queryset = self.get_queryset()
+        if queryset:
+            meetings = [(obj.user1, obj.user2) for obj in queryset]
             if (request.user.generaluser, user_target) in meetings:
                 return Response({'message': 'You have already saved this appointment.'}, status=status.HTTP_200_OK)
             if (user_target, request.user.generaluser) in meetings:
@@ -135,8 +136,6 @@ class ListCreateMeetPeopleView(ListCreateAPIView):
             meet_people.user2 = user_target
             meet_people.save()
 
-            # import pdb
-            # pdb.set_trace()
             status1 = request.user.generaluser.status
             status2 = user_target.status
             if (status1 > 2 or status2 > 2) and status1 != status2:
@@ -150,7 +149,7 @@ class ListCreateMeetPeopleView(ListCreateAPIView):
                     new_status = status2 - 1
 
                 UserStatus.objects.create(
-                    user=user, effective_factor=factor, status=new_status)
+                    type=2, user=user, effective_factor=factor, status=new_status)
                 meetings_people(user)
 
             return Response({'status': request.user.generaluser.status}, status=status.HTTP_201_CREATED)
