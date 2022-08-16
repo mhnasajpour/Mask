@@ -160,3 +160,14 @@ class ListCreateMeetPeopleView(ListCreateAPIView):
                 meetings_people(user)
 
             return Response({'status': request.user.generaluser.status}, status=status.HTTP_201_CREATED)
+
+
+class StatisticsView(APIView):
+    def get(self, request, day):
+        meetings = UserStatus.objects.filter(
+            date_created__gt=datetime.now()-timedelta(days=day), status__gt=2)
+
+        codes = [0] * 3
+        for meet in meetings:
+            codes[meet.status-3] += 1
+        return Response({'Perilous': codes[0], 'Patient': codes[1], 'Dead': codes[2]}, status=status.HTTP_200_OK)
