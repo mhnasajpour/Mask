@@ -1,6 +1,9 @@
 from rest_framework import serializers
+
+from public_place.models import PublicPlace
 from .models import GeneralUser, UserStatus, MeetPeople
 from datetime import timedelta
+from public_place.serializers import MinorPlaceDetailsSerializer
 
 
 class AbstractUserDetailsSerializer(serializers.ModelSerializer):
@@ -48,6 +51,25 @@ class GeneralUserSerializer(AbstractUserDetailsSerializer):
         return instance
 
 
+class PublicPlaceSerializer(AbstractUserDetailsSerializer):
+    name = serializers.CharField(max_length=255, required=True)
+    location = serializers.CharField(max_length=255, required=True)
+    region = serializers.IntegerField(min_value=0, required=True)
+
+    class Meta:
+        model = PublicPlace
+        fields = ('pk', 'type', 'is_staff', 'status', 'first_name', 'last_name', 'username', 'email',
+                  'national_code', 'phone_number', 'name', 'location', 'region')
+
+    def update(self, instance, data):
+        self.update_user(instance=instance.user, data=data['user'])
+        instance.name = data.get('name', instance.name)
+        instance.location = data.get('location', instance.location)
+        instance.region = data.get('region', instance.region)
+        instance.save()
+        return instance
+
+
 class RecordLatestHealthStatusSerializer(serializers.Serializer):
     cough = serializers.BooleanField(default=False)
     fever = serializers.BooleanField(default=False)
@@ -73,14 +95,17 @@ class ListUserStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserStatus
-        fields = ('factor', 'status', 'date')
+        fields = ('type', 'factor', 'status', 'date')
 
     def get_factor(self, obj):
-        if obj.effective_factor == -1:
-            return 'Got better'
-        if obj.effective_factor == 0:
+        if obj.type == 1:
             return 'Test'
-        return MinorUserDetailsSerializer(obj.user).data
+        if obj.type == 2:
+            return MinorUserDetailsSerializer(GeneralUser.objects.get(pk=obj.effective_factor)).data
+        if obj.type == 3:
+            return MinorPlaceDetailsSerializer(PublicPlace.objects.get(pk=obj.effective_factor)).data
+        if obj.type == 4:
+            return 'Got better'
 
 
 class ListCreateMeetPeopleserializers(serializers.ModelSerializer):
