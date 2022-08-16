@@ -1,7 +1,6 @@
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, ListCreateAPIView
-from rest_framework.permissions import IsAuthenticated
-
-from .serializers import GeneralUserSerializer, PublicPlaceSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers, MinorUserDetailsSerializer
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from .serializers import GeneralUserSerializer, PublicPlaceSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers, MinorUserDetailsSerializer, ListUserSerializer
 from rest_framework.views import APIView
 from .permissions import IsQualified, IsGeneralUser
 from rest_framework.response import Response
@@ -171,3 +170,14 @@ class StatisticsView(APIView):
         for meet in meetings:
             codes[meet.status-3] += 1
         return Response({'Perilous': codes[0], 'Patient': codes[1], 'Dead': codes[2]}, status=status.HTTP_200_OK)
+
+
+class ListUserView(ListAPIView):
+    permission_classes = [IsQualified, IsAdminUser]
+    serializer_class = ListUserSerializer
+
+    def get_queryset(self):
+        status = self.request.GET.get('status')
+        if not status:
+            return GeneralUser.objects.all()
+        return [obj for obj in GeneralUser.objects.all() if obj.status == int(status)]

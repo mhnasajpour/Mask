@@ -85,7 +85,7 @@ class MinorUserDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GeneralUser
-        fields = ('first_name', 'last_name', 'email', 'status')
+        fields = ('first_name', 'last_name', 'email')
 
 
 class ListUserStatusSerializer(serializers.ModelSerializer):
@@ -140,3 +140,19 @@ class ListCreateMeetPeopleserializers(serializers.ModelSerializer):
                 .last().status
         except:
             return 1
+
+
+class ListUserSerializer(MinorUserDetailsSerializer):
+    national_code = serializers.ReadOnlyField(source='user.national_code')
+    date = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = GeneralUser
+        fields = ('pk', 'first_name', 'last_name',
+                  'national_code', 'email', 'date')
+
+    def get_date(self, obj):
+        try:
+            return obj.userstatus_set.last().date_created.date()
+        except:
+            return None
