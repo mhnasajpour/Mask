@@ -1,6 +1,6 @@
-from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, ListCreateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .serializers import GeneralUserSerializer, PublicPlaceSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers, MinorUserDetailsSerializer, ListUserSerializer
+from .serializers import GeneralUserSerializer, PublicPlaceSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers, MinorUserDetailsSerializer, ListUserSerializer, ControlPatientsSerializer
 from rest_framework.views import APIView
 from .permissions import IsQualified, IsGeneralUser
 from rest_framework.response import Response
@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from django.db.models import Q
 from public_place.views import meetings_place
 from django.db import transaction
+from django.http import Http404
 
 
 def update_status(user):
@@ -181,3 +182,26 @@ class ListUserView(ListAPIView):
         if not status:
             return GeneralUser.objects.all()
         return [obj for obj in GeneralUser.objects.all() if obj.status == int(status)]
+
+
+class ControlPatientsView(RetrieveAPIView):
+    permission_classes = [IsQualified, IsAdminUser]
+    serializer_class = ControlPatientsSerializer
+
+    def get_object(self):
+        user = GeneralUser.objects.get(pk=self.kwargs['pk'])
+        if user.status == 4:
+            return user
+        raise Http404()
+
+    def put(self, request, pk):
+        serializer = ControlPatientsSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user_status = UserStatus()
+        user_status.type = 4
+        user_status.user_id = pk
+        user_status.status = serializer.data['status']
+        user_status.save()
+
+        return Response({'status': serializer.data['status']}, status=status.HTTP_201_CREATED)
