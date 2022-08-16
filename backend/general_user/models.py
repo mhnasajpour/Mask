@@ -54,9 +54,17 @@ class GeneralUser(models.Model):
 
 
 class UserStatus(models.Model):
+    TYPE_CHOICES = (
+        (1, 'Test'),
+        (2, 'Person'),
+        (3, 'Place'),
+        (4, 'Got better')
+    )
+
+    type = models.IntegerField(choices=TYPE_CHOICES)
     user = models.ForeignKey(GeneralUser, on_delete=models.CASCADE)
     status = models.PositiveSmallIntegerField(choices=USER_STATUS_CHOICES)
-    effective_factor = models.IntegerField()
+    effective_factor = models.CharField(max_length=50, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
 
 
