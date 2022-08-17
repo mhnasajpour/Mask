@@ -1,7 +1,5 @@
-from asyncore import write
 from rest_framework import serializers
-
-from public_place.models import PublicPlace
+from public_place.models import BusinessOwner
 from .models import GeneralUser, UserStatus, MeetPeople
 from datetime import timedelta
 from public_place.serializers import MinorPlaceDetailsSerializer
@@ -53,20 +51,32 @@ class GeneralUserSerializer(AbstractUserDetailsSerializer):
 
 
 class PublicPlaceSerializer(AbstractUserDetailsSerializer):
-    name = serializers.CharField(max_length=255, required=True)
-    location = serializers.CharField(max_length=255, required=True)
-    region = serializers.IntegerField(min_value=0, required=True)
+    name = serializers.CharField(max_length=150)
+    city = serializers.CharField(max_length=150)
+    zip_code = serializers.CharField(max_length=10)
+    address = serializers.CharField(max_length=500)
+
+    latitude = serializers.FloatField(required=False)
+    longitude = serializers.FloatField(required=False)
 
     class Meta:
-        model = PublicPlace
+        model = BusinessOwner
         fields = ('pk', 'type', 'is_staff', 'status', 'first_name', 'last_name', 'username', 'email',
-                  'national_code', 'phone_number', 'name', 'location', 'region')
+                  'national_code', 'phone_number', 'name', 'city', 'zip_code', 'address', 'latitude', 'longitude')
+
+    def validate_zip_code(self, zip_code):
+        if len(zip_code) == 10 and zip_code.isnumeric():
+            return zip_code
+        raise serializers.ValidationError('Zip code is invalid.')
 
     def update(self, instance, data):
         self.update_user(instance=instance.user, data=data['user'])
         instance.name = data.get('name', instance.name)
-        instance.location = data.get('location', instance.location)
-        instance.region = data.get('region', instance.region)
+        instance.city = data.get('city', instance.city)
+        instance.zip_code = data.get('zip_code', instance.zip_code)
+        instance.address = data.get('address', instance.address)
+        instance.longitude = data.get('longitude', instance.longitude)
+        instance.latitude = data.get('latitude', instance.latitude)
         instance.save()
         return instance
 
@@ -104,7 +114,7 @@ class ListUserStatusSerializer(serializers.ModelSerializer):
         if obj.type == 2:
             return MinorUserDetailsSerializer(GeneralUser.objects.get(pk=obj.effective_factor)).data
         if obj.type == 3:
-            return MinorPlaceDetailsSerializer(PublicPlace.objects.get(pk=obj.effective_factor)).data
+            return MinorPlaceDetailsSerializer(BusinessOwner.objects.get(pk=obj.effective_factor)).data
         if obj.type == 4:
             return 'Got better'
 
