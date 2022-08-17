@@ -1,10 +1,14 @@
-from pyexpat import model
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from .models import Hospital
 
 
-class HospitalSerializer(ModelSerializer):
+class HospitalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hospital
-        fields = ('pk', 'name', 'location', 'region', 'address')
-        read_only_fields = ('pk',)
+        fields = ('name', 'city', 'zip_code',
+                  'address', 'longitude', 'latitude')
+
+    def validate_zip_code(self, zip_code):
+        if len(zip_code) == 10 and zip_code.isnumeric():
+            return zip_code
+        raise serializers.ValidationError('Zip code is invalid.')
