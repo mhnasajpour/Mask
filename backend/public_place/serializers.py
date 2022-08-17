@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import PublicPlace, MeetPlace, WHITEPLACE, PLACE_STATUS_CHOICES
+from .models import BusinessOwner, MeetPlace, WHITEPLACE, PLACE_STATUS_CHOICES
 from datetime import timedelta
 
 
@@ -9,10 +9,17 @@ class ChangePlaceStatusSerializer(serializers.Serializer):
 
 class MinorPlaceDetailsSerializer(serializers.ModelSerializer):
     email = serializers.ReadOnlyField(source='user.email')
+    name = serializers.ReadOnlyField(source='place.name')
+    city = serializers.ReadOnlyField(source='place.city')
+    zip_code = serializers.ReadOnlyField(source='place.zip_code')
+    address = serializers.ReadOnlyField(source='place.address')
+    longitude = serializers.ReadOnlyField(source='place.longitude')
+    latitude = serializers.ReadOnlyField(source='place.latitude')
 
     class Meta:
-        model = PublicPlace
-        fields = ('pk', 'email', 'name', 'location', 'region')
+        model = BusinessOwner
+        fields = ('pk', 'email', 'name', 'city', 'zip_code',
+                  'address', 'latitude', 'longitude')
 
 
 class ListCreateMeetPlaceSerializer(serializers.ModelSerializer):

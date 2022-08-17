@@ -4,7 +4,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import ChangePlaceStatusSerializer, MinorPlaceDetailsSerializer, ListCreateMeetPlaceSerializer
-from .models import PublicPlace, PlaceStatus, MeetPlace
+from .models import BusinessOwner, PlaceStatus, MeetPlace
 from datetime import datetime, timedelta
 from config.settings import WHITEPLACE, REDPLACE
 from django.db.models import Q
@@ -26,7 +26,7 @@ def meetings_place(user):
 
 class MinorPlaceDetailsView(ListAPIView):
     serializer_class = MinorPlaceDetailsSerializer
-    queryset = PublicPlace.objects.filter(~Q(name=''))
+    queryset = BusinessOwner.objects.filter(~Q(place__name=''))
 
 
 class ChangePlaceStatusView(APIView):
@@ -34,7 +34,7 @@ class ChangePlaceStatusView(APIView):
     serializer_class = ChangePlaceStatusSerializer
 
     def get(self, request):
-        serializer = ChangePlaceStatusSerializer(request.user.publicplace)
+        serializer = ChangePlaceStatusSerializer(request.user.businessowner)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -42,9 +42,9 @@ class ChangePlaceStatusView(APIView):
         serializer.is_valid(raise_exception=True)
 
         place_status = PlaceStatus()
-        place_status.type = 2 if serializer.data.get(
-            'status') == WHITEPLACE else 4
-        place_status.place = request.user.publicplace
+        place_status.type = 2 if serializer.data \
+            .get('status') == WHITEPLACE else 4
+        place_status.place = request.user.businessowner
         place_status.status = serializer.data.get('status')
         place_status.save()
 
@@ -56,7 +56,7 @@ class MeetPlaceStatisticsView(APIView):
 
     def get(self, request, day):
         codes = [0] * 6
-        meetings = request.user.publicplace.meetplace_set \
+        meetings = request.user.businessowner.meetplace_set \
             .filter(date_created__gt=datetime.now()-timedelta(days=day))
 
         for meet in meetings:
@@ -76,7 +76,7 @@ class ListCreateMeetPlaceView(ListCreateAPIView):
     def post(self, request):
         serializer = ListCreateMeetPlaceSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        place_target = PublicPlace.objects.get(pk=serializer.data['place'])
+        place_target = BusinessOwner.objects.get(pk=serializer.data['place'])
         user_target = request.user.generaluser
 
         meetings = [obj.place for obj in self.get_queryset()]
