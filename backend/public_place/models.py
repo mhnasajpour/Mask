@@ -2,6 +2,7 @@ from django.db import models
 from general_user.models import User, GeneralUser
 from config.settings import WHITEPLACE, REDPLACE
 import uuid
+from django.core.exceptions import ValidationError
 
 
 PLACE_STATUS_CHOICES = (
@@ -10,12 +11,24 @@ PLACE_STATUS_CHOICES = (
 )
 
 
-class PublicPlace(models.Model):
+class Place(models.Model):
+    name = models.CharField(max_length=150)
+    city = models.CharField(max_length=150)
+    zip_code = models.CharField(unique=True, max_length=10)
+    address = models.TextField(max_length=500)
+
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+    def clean(self):
+        if len(self.zip_code) != 10 or not self.zip_code.isnumeric():
+            raise ValidationError('Zip code is invalid.')
+
+
+class BusinessOwner(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, models.CASCADE)
-    name = models.CharField(max_length=255, blank=True)
-    location = models.CharField(max_length=255, blank=True)
-    region = models.PositiveSmallIntegerField(null=True)
+    place = models.OneToOneField(Place, on_delete=models.SET_NULL, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
@@ -36,7 +49,7 @@ class PlaceStatus(models.Model):
     )
 
     type = models.IntegerField(choices=TYPE_CHOICES)
-    place = models.ForeignKey(PublicPlace, on_delete=models.CASCADE)
+    place = models.ForeignKey(BusinessOwner, on_delete=models.CASCADE)
     status = models.CharField(max_length=1, choices=PLACE_STATUS_CHOICES)
     effective_factor = models.CharField(max_length=50, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -45,5 +58,5 @@ class PlaceStatus(models.Model):
 class MeetPlace(models.Model):
     user = models.ForeignKey(GeneralUser, on_delete=models.SET_NULL, null=True)
     place = models.ForeignKey(
-        PublicPlace, on_delete=models.SET_NULL, null=True)
+        BusinessOwner, on_delete=models.SET_NULL, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
