@@ -1,10 +1,7 @@
 from django.db import models
+from public_place.models import Place
 
 
-class Hospital(models.Model):
-    name = models.CharField(max_length=255)
-    location = models.CharField(max_length=255)
-    region = models.PositiveSmallIntegerField()
-    address = models.TextField()
+class Hospital(Place):
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
