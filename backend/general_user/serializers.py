@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from public_place.models import BusinessOwner
+from public_place.models import Place, BusinessOwner
 from .models import GeneralUser, UserStatus, MeetPeople
 from datetime import timedelta
 from public_place.serializers import MinorPlaceDetailsSerializer
@@ -66,6 +66,9 @@ class BusinessOwnerSerializer(AbstractUserDetailsSerializer):
 
     def validate_zip_code(self, zip_code):
         if len(zip_code) == 10 and zip_code.isnumeric():
+            if Place.objects.filter(zip_code=zip_code):
+                raise serializers.ValidationError(
+                    'Place with this Zip code already exists.')
             return zip_code
         raise serializers.ValidationError('Zip code is invalid.')
 
