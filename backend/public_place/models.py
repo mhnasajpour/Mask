@@ -12,13 +12,13 @@ PLACE_STATUS_CHOICES = (
 
 
 class Place(models.Model):
-    name = models.CharField(max_length=150)
-    city = models.CharField(max_length=150)
-    zip_code = models.CharField(unique=True, max_length=10)
-    address = models.TextField(max_length=500)
+    name = models.CharField(max_length=150, blank=True)
+    city = models.CharField(max_length=150, blank=True)
+    zip_code = models.CharField(unique=True, max_length=10, blank=True)
+    address = models.TextField(max_length=500, blank=True)
 
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
 
     def clean(self):
         if len(self.zip_code) != 10 or not self.zip_code.isnumeric():
