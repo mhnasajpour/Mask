@@ -50,14 +50,14 @@ class GeneralUserSerializer(AbstractUserDetailsSerializer):
         return instance
 
 
-class PublicPlaceSerializer(AbstractUserDetailsSerializer):
-    name = serializers.CharField(max_length=150)
-    city = serializers.CharField(max_length=150)
-    zip_code = serializers.CharField(max_length=10)
-    address = serializers.CharField(max_length=500)
+class BusinessOwnerSerializer(AbstractUserDetailsSerializer):
+    name = serializers.CharField(source='place.name', max_length=150)
+    city = serializers.CharField(source='place.city', max_length=150)
+    zip_code = serializers.CharField(source='place.zip_code', max_length=10)
+    address = serializers.CharField(source='place.address', max_length=500)
 
-    latitude = serializers.FloatField(required=False)
-    longitude = serializers.FloatField(required=False)
+    latitude = serializers.FloatField(source='place.latitude')
+    longitude = serializers.FloatField(source='place.longitude')
 
     class Meta:
         model = BusinessOwner
@@ -71,13 +71,15 @@ class PublicPlaceSerializer(AbstractUserDetailsSerializer):
 
     def update(self, instance, data):
         self.update_user(instance=instance.user, data=data['user'])
-        instance.name = data.get('name', instance.name)
-        instance.city = data.get('city', instance.city)
-        instance.zip_code = data.get('zip_code', instance.zip_code)
-        instance.address = data.get('address', instance.address)
-        instance.longitude = data.get('longitude', instance.longitude)
-        instance.latitude = data.get('latitude', instance.latitude)
-        instance.save()
+        place = instance.place
+        data = data['place']
+        place.name = data.get('name', data['name'])
+        place.city = data.get('city', data['city'])
+        place.zip_code = data.get('zip_code', data['zip_code'])
+        place.address = data.get('address', data['address'])
+        place.longitude = data.get('longitude', data['longitude'])
+        place.latitude = data.get('latitude', data['latitude'])
+        instance.place.save()
         return instance
 
 
