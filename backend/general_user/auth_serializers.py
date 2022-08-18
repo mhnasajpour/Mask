@@ -2,7 +2,7 @@ from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from dj_rest_auth.serializers import LoginSerializer, PasswordResetSerializer
 from general_user.models import User, GeneralUser
-from public_place.models import BusinessOwner
+from public_place.models import BusinessOwner, Place
 from config.settings import GENERAL_USER, BUSINESS_USER
 from django.contrib.auth import get_user_model
 import re
@@ -37,7 +37,8 @@ class CustomRegisterSerializer(RegisterSerializer):
         if self.validated_data.get('type') == GENERAL_USER:
             GeneralUser.objects.create(user=user)
         elif self.validated_data.get('type') == BUSINESS_USER:
-            BusinessOwner.objects.create(user=user)
+            BusinessOwner.objects.create(
+                user=user, place=Place.objects.create())
         user.save()
         return user
 
