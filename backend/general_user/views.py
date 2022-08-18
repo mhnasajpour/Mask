@@ -1,6 +1,6 @@
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .serializers import GeneralUserSerializer, PublicPlaceSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers, MinorUserDetailsSerializer, ListUserSerializer, ControlPatientsSerializer
+from .serializers import GeneralUserSerializer, BusinessOwnerSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers, MinorUserDetailsSerializer, ListUserSerializer, ControlPatientsSerializer
 from rest_framework.views import APIView
 from .permissions import IsQualified, IsGeneralUser
 from rest_framework.response import Response
@@ -52,13 +52,13 @@ class UserDetailsView(RetrieveUpdateAPIView):
         if hasattr(self.request.user, 'generaluser'):
             return GeneralUserSerializer
         if hasattr(self.request.user, 'businessowner'):
-            return PublicPlaceSerializer
+            return BusinessOwnerSerializer
 
     def get_object(self):
         if hasattr(self.request.user, 'generaluser'):
             return self.request.user.generaluser
         if hasattr(self.request.user, 'businessowner'):
-            return self.request.user.publicplace
+            return self.request.user.businessowner
 
 
 class MinorPlaceDetailsView(ListAPIView):
