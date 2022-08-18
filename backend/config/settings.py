@@ -160,7 +160,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 
-LOGIN_URL = 'http://localhost:8000/auth/login/'
+LOGIN_URL = 'http://127.0.0.1:8000/auth/login/'
 ACCOUNT_LOGOUT_ON_GET = True
 
 REST_USE_JWT = True
