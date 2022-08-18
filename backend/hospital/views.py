@@ -15,12 +15,12 @@ class ListCreateHospitalView(ListCreateAPIView):
         else:
             queryset = Hospital.objects.all()
 
-        latitude = float(self.request.GET.get('lat'))
-        longitude = float(self.request.GET.get('lon'))
+        latitude = self.request.GET.get('lat')
+        longitude = self.request.GET.get('lon')
         if latitude and longitude:
             queryset = list(queryset)
             queryset.sort(
-                key=lambda x: (x.latitude-latitude)**2 + (x.longitude-longitude)**2)
+                key=lambda x: (x.latitude-float(latitude))**2 + (x.longitude-float(longitude))**2)
         return queryset
 
 
