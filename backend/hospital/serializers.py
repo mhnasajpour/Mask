@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Hospital
+from public_place.models import Place
 
 
 class HospitalSerializer(serializers.ModelSerializer):
@@ -17,5 +18,8 @@ class HospitalSerializer(serializers.ModelSerializer):
 
     def validate_zip_code(self, zip_code):
         if len(zip_code) == 10 and zip_code.isnumeric():
+            if Place.objects.filter(zip_code=zip_code):
+                raise serializers.ValidationError(
+                    'Place with this Zip code already exists.')
             return zip_code
         raise serializers.ValidationError('Zip code is invalid.')
