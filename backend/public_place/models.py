@@ -3,6 +3,7 @@ from general_user.models import User, GeneralUser
 from config.settings import WHITEPLACE, REDPLACE
 import uuid
 from django.core.exceptions import ValidationError
+from django.utils.html import format_html
 
 
 PLACE_STATUS_CHOICES = (
@@ -19,6 +20,10 @@ class Place(models.Model):
 
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
+
+    @property
+    def map(self):
+        return format_html(f'<iframe src="https://maps.google.com/maps?q={self.latitude},{self.longitude}&hl=en&z=16&amp;output=embed" width="483" height="300"></iframe>')
 
     def clean(self):
         if len(self.zip_code) != 10 or not self.zip_code.isnumeric():
