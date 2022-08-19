@@ -7,6 +7,8 @@ from .models import Hospital
 class PlaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'city', 'zip_code', 'address')
     readonly_fields = ('pk', 'map')
+    search_fields = ('name', 'zip_code', 'address')
+    list_filter = ('city',)
 
     fieldsets = (
         ('Specifications', {
@@ -16,6 +18,3 @@ class PlaceAdmin(admin.ModelAdmin):
             'fields': ('address', ('latitude', 'longitude'), 'map'),
         }),
     )
-
-    def map(self, obj):
-        return format_html(f'<iframe src="https://maps.google.com/maps?q={obj.latitude},{obj.longitude}&hl=en&z=16&amp;output=embed" width="483" height="300"></iframe>')
