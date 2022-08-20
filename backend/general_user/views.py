@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from django.db.models import Q
 from public_place.views import meetings_place
 from django.db import transaction
-from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 
 def update_status(user):
@@ -189,10 +189,7 @@ class ControlPatientsView(RetrieveAPIView):
     serializer_class = ControlPatientsSerializer
 
     def get_object(self):
-        user = GeneralUser.objects.get(pk=self.kwargs['pk'])
-        if user.status == 4:
-            return user
-        raise Http404()
+        return get_object_or_404(GeneralUser, pk=self.kwargs['pk'])
 
     def put(self, request, pk):
         serializer = ControlPatientsSerializer(data=request.data)
