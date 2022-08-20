@@ -3,6 +3,8 @@ from django import forms
 from django.contrib import admin
 from .models import Place, BusinessOwner, PlaceStatus, MeetPlace, WHITEPLACE, REDPLACE
 from django_reverse_admin import ReverseModelAdmin
+from django.utils.html import format_html
+from general_user.models import GeneralUser
 
 
 @admin.register(Place)
@@ -10,6 +12,7 @@ class PlaceAdmin(admin.ModelAdmin):
     list_display = ('name', 'city', 'zip_code', 'address')
     readonly_fields = ('pk', 'map')
     list_filter = ('city',)
+    search_fields = ('name', 'zip_code', 'address')
     fieldsets = (
         ('Specifications', {
             'fields': ('pk', 'name', 'city', 'zip_code')
@@ -52,7 +55,6 @@ class IsPaidFilter(admin.SimpleListFilter):
 @admin.register(BusinessOwner)
 class BusinessOwnerAdmin(ReverseModelAdmin):
     form = BusinessOwnerModelForm
-
     inline_type = 'stacked'
     inline_reverse = (
         ('user', {'fields': (('first_name', 'last_name'), ('username', 'password'),
@@ -60,13 +62,10 @@ class BusinessOwnerAdmin(ReverseModelAdmin):
         ('place', {'fields': ('name', 'city', 'zip_code',
                               'address', ('latitude', 'longitude'))}),
     )
-
     list_display = ('pk', 'name', 'zip_code',
                     'first_name', 'last_name', 'email')
-
     fields = ('pk', 'user_id', 'place_id', ('status', 'change'), 'map')
     readonly_fields = ('pk', 'user_id', 'place_id', 'status', 'map')
-
     list_filter = (IsPaidFilter,)
     search_fields = ('pk', 'place__name', 'place__city', 'place__zip_code',
                      'user__first_name', 'user__last_name', 'user__email', 'user__national_code')
@@ -107,3 +106,41 @@ class BusinessOwnerAdmin(ReverseModelAdmin):
 
     def map(self, obj):
         return obj.place.map
+
+
+@admin.register(PlaceStatus)
+class PlaceStatusAdmin(admin.ModelAdmin):
+    date_hierarchy = 'date_created'
+    list_display = ('pk', 'place_id', 'name', 'type', 'color')
+    readonly_fields = ('pk', 'place', 'name', 'color',
+                       'date_created', 'factor')
+    fields = ('pk', 'name', 'place', 'type',
+              ('status', 'color'), 'date_created', 'factor')
+    list_filter = ('type', 'status', 'date_created')
+    search_fields = ('place__pk', 'place__place__name', 'effective_factor')
+
+    def has_add_permission(self, request):
+        return False
+
+    def place_id(self, obj):
+        return obj.place.pk
+
+    def place(self, obj):
+        return obj.place.place
+
+    def name(self, obj):
+        return obj.place.place.name
+
+    def color(self, obj):
+        const = 'color: white; padding: 1px 3px; width: 30px; border-radius: 10px; text-align: center; margin: 0px; font-size: 11px;"'
+        style = f'style="background-color: {"red" if obj.status == REDPLACE else "green"}; {const}'
+        return format_html(f'<p {style}>{"R" if obj.status == REDPLACE else "W"}</p>')
+
+    def factor(self, obj):
+        if obj.effective_factor:
+            user = GeneralUser.objects.get(pk=obj.effective_factor).user
+            return f'name: {user.first_name} {user.last_name}\n' + \
+                f'username: {user.username}\n' + \
+                f'email: {user.email}\n' + \
+                f'national code: {user.national_code}'
+        return obj.effective_factor
