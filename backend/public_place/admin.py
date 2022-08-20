@@ -31,6 +31,24 @@ class BusinessOwnerModelForm(forms.ModelForm):
         fields = '__all__'
 
 
+class IsPaidFilter(admin.SimpleListFilter):
+    title = 'status'
+    parameter_name = 'status'
+
+    def lookups(self, request, model_admin):
+        return [
+            (WHITEPLACE, 'WHITE'),
+            (REDPLACE, 'RED')
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            pks = [obj.pk for obj in queryset if obj.status == self.value()]
+            return queryset.filter(pk__in=pks)
+        else:
+            return queryset
+
+
 @admin.register(BusinessOwner)
 class BusinessOwnerAdmin(ReverseModelAdmin):
     form = BusinessOwnerModelForm
@@ -48,6 +66,8 @@ class BusinessOwnerAdmin(ReverseModelAdmin):
 
     fields = ('pk', 'user_id', 'place_id', ('status', 'change'), 'map')
     readonly_fields = ('pk', 'user_id', 'place_id', 'status', 'map')
+
+    list_filter = (IsPaidFilter,)
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
