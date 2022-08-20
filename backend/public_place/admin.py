@@ -68,6 +68,8 @@ class BusinessOwnerAdmin(ReverseModelAdmin):
     readonly_fields = ('pk', 'user_id', 'place_id', 'status', 'map')
 
     list_filter = (IsPaidFilter,)
+    search_fields = ('pk', 'place__name', 'place__city', 'place__zip_code',
+                     'user__first_name', 'user__last_name', 'user__email', 'user__national_code')
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
