@@ -34,7 +34,7 @@ class BusinessOwnerModelForm(forms.ModelForm):
         fields = '__all__'
 
 
-class IsPaidFilter(admin.SimpleListFilter):
+class StatusFilter(admin.SimpleListFilter):
     title = 'status'
     parameter_name = 'status'
 
@@ -57,7 +57,7 @@ class BusinessOwnerAdmin(ReverseModelAdmin):
     form = BusinessOwnerModelForm
     inline_type = 'stacked'
     inline_reverse = (
-        ('user', {'fields': (('first_name', 'last_name'), ('username', 'password'),
+        ('user', {'fields': (('first_name', 'last_name'), 'username',
                              'email', 'national_code', 'phone_number', 'is_staff', 'is_active')}),
         ('place', {'fields': ('name', 'city', 'zip_code',
                               'address', ('latitude', 'longitude'))}),
@@ -66,19 +66,17 @@ class BusinessOwnerAdmin(ReverseModelAdmin):
                     'first_name', 'last_name', 'email')
     fields = ('pk', 'user_id', 'place_id', ('status', 'change'), 'map')
     readonly_fields = ('pk', 'user_id', 'place_id', 'status', 'map')
-    list_filter = (IsPaidFilter,)
+    list_filter = (StatusFilter,)
     search_fields = ('pk', 'place__name', 'place__city', 'place__zip_code',
                      'user__first_name', 'user__last_name', 'user__email', 'user__national_code')
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        obj.user.set_password(obj.user.password)
         if form.cleaned_data['change']:
             PlaceStatus.objects.create(
                 place=obj,
                 type=2 if obj.status == REDPLACE else 4,
                 status=REDPLACE if obj.status == WHITEPLACE else WHITEPLACE)
-        obj.user.save()
 
     def has_add_permission(self, request):
         return False
