@@ -133,7 +133,7 @@ class PlaceStatusAdmin(admin.ModelAdmin):
 
     def color(self, obj):
         const = 'color: white; padding: 1px 3px; width: 30px; border-radius: 10px; text-align: center; margin: 0px; font-size: 11px;"'
-        style = f'style="background-color: {"red" if obj.status == REDPLACE else "green"}; {const}'
+        style = f'style="background-color: rgb({"220,20,60" if obj.status == REDPLACE else "60,179,113"}); {const}'
         return format_html(f'<p {style}>{"R" if obj.status == REDPLACE else "W"}</p>')
 
     def factor(self, obj):
