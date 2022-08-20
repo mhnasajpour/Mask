@@ -144,3 +144,42 @@ class PlaceStatusAdmin(admin.ModelAdmin):
                 f'email: {user.email}\n' + \
                 f'national code: {user.national_code}'
         return obj.effective_factor
+
+
+@admin.register(MeetPlace)
+class MeetPlaceAdmin(admin.ModelAdmin):
+    date_hierarchy = 'date_created'
+    list_display = ('pk', 'place_id', 'name',
+                    'first_name', 'last_name', 'email')
+    readonly_fields = ('pk', 'place', 'general_user', 'name', 'date_created')
+    fields = ('pk', 'name', 'place', 'general_user', 'date_created')
+    list_filter = ('date_created',)
+    search_fields = ('place__pk', 'place__place__name', 'user__user__email')
+
+    def has_add_permission(self, request):
+        return False
+
+    def place_id(self, obj):
+        return obj.place.pk
+
+    def name(self, obj):
+        return obj.place.place.name
+
+    def first_name(self, obj):
+        return obj.user.user.first_name
+
+    def last_name(self, obj):
+        return obj.user.user.last_name
+
+    def email(self, obj):
+        return obj.user.user.email
+
+    def general_user(self, obj):
+        user = obj.user.user
+        return f'name: {user.first_name} {user.last_name}\n' + \
+            f'username: {user.username}\n' + \
+            f'email: {user.email}\n' + \
+            f'national code: {user.national_code}'
+
+    def place(self, obj):
+        return obj.place
