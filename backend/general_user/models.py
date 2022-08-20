@@ -28,7 +28,7 @@ class User(AbstractUser):
     def type(self):
         if hasattr(self, 'generaluser'):
             return GENERAL_USER
-        if hasattr(self, 'publicplace'):
+        if hasattr(self, 'businessowner'):
             return BUSINESS_USER
 
 
