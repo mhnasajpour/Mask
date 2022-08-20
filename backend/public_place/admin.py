@@ -1,5 +1,7 @@
+import imp
+from django import forms
 from django.contrib import admin
-from .models import Place, BusinessOwner, PlaceStatus, MeetPlace
+from .models import Place, BusinessOwner, PlaceStatus, MeetPlace, WHITEPLACE, REDPLACE
 from django_reverse_admin import ReverseModelAdmin
 
 
@@ -21,8 +23,18 @@ class PlaceAdmin(admin.ModelAdmin):
         return False
 
 
+class BusinessOwnerModelForm(forms.ModelForm):
+    change = forms.BooleanField(required=False)
+
+    class Meta:
+        model = BusinessOwner
+        fields = '__all__'
+
+
 @admin.register(BusinessOwner)
 class BusinessOwnerAdmin(ReverseModelAdmin):
+    form = BusinessOwnerModelForm
+
     inline_type = 'stacked'
     inline_reverse = (
         ('user', {'fields': (('first_name', 'last_name'), ('username', 'password'),
@@ -34,12 +46,17 @@ class BusinessOwnerAdmin(ReverseModelAdmin):
     list_display = ('pk', 'name', 'zip_code',
                     'first_name', 'last_name', 'email')
 
-    fields = ('pk', 'user_id', 'place_id', 'map')
-    readonly_fields = fields
+    fields = ('pk', 'user_id', 'place_id', ('status', 'change'), 'map')
+    readonly_fields = ('pk', 'user_id', 'place_id', 'status', 'map')
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         obj.user.set_password(obj.user.password)
+        if form.cleaned_data['change']:
+            PlaceStatus.objects.create(
+                place=obj,
+                type=2 if obj.status == REDPLACE else 4,
+                status=REDPLACE if obj.status == WHITEPLACE else WHITEPLACE)
         obj.user.save()
 
     def has_add_permission(self, request):
