@@ -58,7 +58,8 @@ class UserStatus(models.Model):
         (1, 'Test'),
         (2, 'Person'),
         (3, 'Place'),
-        (4, 'Got better')
+        (4, 'Got better'),
+        (5, 'Dead')
     )
 
     type = models.IntegerField(choices=TYPE_CHOICES)
