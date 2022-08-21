@@ -164,3 +164,33 @@ class UserStatusAdmin(admin.ModelAdmin):
         if obj.status == 5:
             color = '50,50,50'
         return format_html(f'<p style="background-color: rgb({color}); color: white; padding: 1px 3px; width: 30px; border-radius: 10px; text-align: center; margin: 0px; font-size: 11px;">{obj.status}</p>')
+
+
+@admin.register(MeetPeople)
+class MeetPeopleAdmin(admin.ModelAdmin):
+    date_hierarchy = 'date_created'
+    list_display = ('pk', 'first_name1', 'last_name1',
+                    'first_name2', 'last_name2', 'date_created')
+    fields = ('pk', 'user1', 'user2', 'date_created')
+    readonly_fields = ('pk', 'user1', 'user2', 'date_created')
+    list_filter = ('date_created',)
+    search_fields = ('user1__user__first_name', 'user2__user__first_name', 'user1__user__last_name',
+                     'user2__user__last_name', 'user1__user__email', 'user2__user__email')
+
+    def user1(self, obj):
+        return obj.user1
+
+    def user2(self, obj):
+        return obj.user2
+
+    def first_name1(self, obj):
+        return obj.user1.user.first_name
+
+    def last_name1(self, obj):
+        return obj.user1.user.last_name
+
+    def first_name2(self, obj):
+        return obj.user2.user.first_name
+
+    def last_name2(self, obj):
+        return obj.user2.user.last_name
