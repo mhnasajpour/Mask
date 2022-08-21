@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import User, GeneralUser, UserStatus, MeetPeople, GENERAL_USER, BUSINESS_USER
 from django.utils.html import format_html
+from public_place.models import BusinessOwner
 
 
 class TypeFilter(admin.SimpleListFilter):
@@ -109,6 +110,49 @@ class GeneralUserAdmin(admin.ModelAdmin):
         return obj.user.email
 
     def status(self, obj):
+        if obj.status == 1:
+            color = '60,179,113'
+        if obj.status == 2:
+            color = '255,180,51'
+        if obj.status == 3:
+            color = '225,52,45'
+        if obj.status == 4:
+            color = '142,15,6'
+        if obj.status == 5:
+            color = '50,50,50'
+        return format_html(f'<p style="background-color: rgb({color}); color: white; padding: 1px 3px; width: 30px; border-radius: 10px; text-align: center; margin: 0px; font-size: 11px;">{obj.status}</p>')
+
+
+@admin.register(UserStatus)
+class UserStatusAdmin(admin.ModelAdmin):
+    date_hierarchy = 'date_created'
+    list_display = ('pk', 'first_name', 'last_name', 'email', 'type', 'color')
+    fieldsets = (
+        (None, {
+            'fields': ('pk', 'user', 'color', 'status', 'date_created')
+        }),
+        ('Factor', {
+            'fields': ('type', 'effective_factor')
+        })
+    )
+    readonly_fields = ('pk', 'user', 'color', 'date_created')
+    list_filter = ('type', StatusFilter, 'date_created')
+    search_fields = ('user__user__first_name', 'user__user__last_name',
+                     'user__user__email', 'effective_factor')
+
+    def user(self, obj):
+        return obj.user
+
+    def first_name(self, obj):
+        return obj.user.user.first_name
+
+    def last_name(self, obj):
+        return obj.user.user.last_name
+
+    def email(self, obj):
+        return obj.user.user.email
+
+    def color(self, obj):
         if obj.status == 1:
             color = '60,179,113'
         if obj.status == 2:
