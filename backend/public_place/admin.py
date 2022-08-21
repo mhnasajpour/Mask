@@ -1,10 +1,10 @@
-import imp
 from django import forms
 from django.contrib import admin
 from .models import Place, BusinessOwner, PlaceStatus, MeetPlace, WHITEPLACE, REDPLACE
 from django_reverse_admin import ReverseModelAdmin
 from django.utils.html import format_html
 from general_user.models import GeneralUser
+from config.settings import DOMAIN
 
 
 @admin.register(Place)
@@ -113,7 +113,7 @@ class PlaceStatusAdmin(admin.ModelAdmin):
     readonly_fields = ('pk', 'place', 'name', 'color',
                        'date_created', 'factor')
     fields = ('pk', 'name', 'place', 'type',
-              ('status', 'color'), 'date_created', 'factor')
+              ('status', 'color'), 'factor', 'date_created')
     list_filter = ('type', 'status', 'date_created')
     search_fields = ('place__pk', 'place__place__name', 'effective_factor')
 
@@ -135,13 +135,8 @@ class PlaceStatusAdmin(admin.ModelAdmin):
         return format_html(f'<p {style}>{"R" if obj.status == REDPLACE else "W"}</p>')
 
     def factor(self, obj):
-        if obj.effective_factor:
-            user = GeneralUser.objects.get(pk=obj.effective_factor).user
-            return f'name: {user.first_name} {user.last_name}\n' + \
-                f'username: {user.username}\n' + \
-                f'email: {user.email}\n' + \
-                f'national code: {user.national_code}'
-        return obj.effective_factor
+        user = GeneralUser.objects.get(pk=obj.effective_factor).user
+        return format_html(f'<a href="{DOMAIN}admin/general_user/generaluser/{obj.effective_factor}/change/">{user}</a>')
 
 
 @admin.register(MeetPlace)
@@ -149,8 +144,8 @@ class MeetPlaceAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_created'
     list_display = ('pk', 'place_id', 'name',
                     'first_name', 'last_name', 'email')
-    readonly_fields = ('pk', 'place', 'general_user', 'name', 'date_created')
-    fields = ('pk', 'name', 'place', 'general_user', 'date_created')
+    readonly_fields = ('pk', 'place', 'user', 'name', 'date_created')
+    fields = ('pk', 'name', 'place', 'user', 'date_created')
     list_filter = ('date_created',)
     search_fields = ('place__pk', 'place__place__name', 'user__user__email')
 
@@ -171,13 +166,3 @@ class MeetPlaceAdmin(admin.ModelAdmin):
 
     def email(self, obj):
         return obj.user.user.email
-
-    def general_user(self, obj):
-        user = obj.user.user
-        return f'name: {user.first_name} {user.last_name}\n' + \
-            f'username: {user.username}\n' + \
-            f'email: {user.email}\n' + \
-            f'national code: {user.national_code}'
-
-    def place(self, obj):
-        return obj.place
