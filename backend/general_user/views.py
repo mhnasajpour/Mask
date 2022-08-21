@@ -196,7 +196,7 @@ class ControlPatientsView(RetrieveAPIView):
         serializer.is_valid(raise_exception=True)
 
         user_status = UserStatus()
-        user_status.type = 4
+        user_status.type = 5 if serializer.data['status'] == 5 else 4
         user_status.user_id = pk
         user_status.status = serializer.data['status']
         user_status.save()
