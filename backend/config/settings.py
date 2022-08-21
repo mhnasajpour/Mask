@@ -147,6 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Custom settings
+DOMAIN = env('DOMAIN')
 AUTH_USER_MODEL = 'general_user.User'
 
 # Authentication
