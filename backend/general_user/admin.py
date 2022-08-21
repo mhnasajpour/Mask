@@ -48,6 +48,9 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'email', 'first_name',
                      'last_name', 'national_code', 'phone_number')
 
+    def has_add_permission(self, request):
+        return False
+
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         obj.set_password(obj.password)
@@ -100,6 +103,9 @@ class GeneralUserAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'user__email', 'user__first_name',
                      'user__last_name', 'user__national_code', 'user__phone_number')
 
+    def has_add_permission(self, request):
+        return False
+
     def first_name(self, obj):
         return obj.user.first_name
 
@@ -140,6 +146,9 @@ class UserStatusAdmin(admin.ModelAdmin):
     search_fields = ('user__user__first_name', 'user__user__last_name',
                      'user__user__email', 'effective_factor')
 
+    def has_add_permission(self, request):
+        return False
+
     def user(self, obj):
         return obj.user
 
@@ -176,6 +185,9 @@ class MeetPeopleAdmin(admin.ModelAdmin):
     list_filter = ('date_created',)
     search_fields = ('user1__user__first_name', 'user2__user__first_name', 'user1__user__last_name',
                      'user2__user__last_name', 'user1__user__email', 'user2__user__email')
+
+    def has_add_permission(self, request):
+        return False
 
     def user1(self, obj):
         return obj.user1
