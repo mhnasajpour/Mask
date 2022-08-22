@@ -11,21 +11,10 @@ from django.db.models import Q
 from public_place.views import meetings_place
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from . import tasks
 
 
-def update_status(user):
-    user_status = user.userstatus_set.last()
-    level = (datetime.now().date() - user_status.date_created.date()).days // 7
-
-    if 1 < user_status.status < 4 and level:
-        new_status = user_status.status-level
-        UserStatus.objects.create(
-            type=4, user=user, status=new_status if new_status > 0 else 1)
-
-
-def meetings_people(user):
-    update_status(user)
-
+def meetings(user):
     if user.status == 4:
         meetings_place(user)
 
@@ -42,7 +31,7 @@ def meetings_people(user):
             if GeneralUser.objects.get(pk=person).status < user.status:
                 UserStatus.objects.create(
                     type=2, user_id=person, effective_factor=user.pk, status=user.status-1)
-                meetings_people(GeneralUser.objects.get(pk=person))
+                meetings(GeneralUser.objects.get(pk=person))
 
 
 class UserDetailsView(RetrieveUpdateAPIView):
@@ -100,7 +89,7 @@ class RecordLatestHealthStatusView(APIView):
             if request.user.generaluser.status <= health_status:
                 UserStatus.objects.create(
                     type=1, user=request.user.generaluser, status=health_status)
-                meetings_people(request.user.generaluser)
+                meetings(request.user.generaluser)
                 return Response({'status': request.user.generaluser.status}, status=status.HTTP_201_CREATED)
 
         return Response({'status': request.user.generaluser.status}, status=status.HTTP_200_OK)
@@ -157,7 +146,7 @@ class ListCreateMeetPeopleView(ListCreateAPIView):
 
                 UserStatus.objects.create(
                     type=2, user=user, effective_factor=factor, status=new_status)
-                meetings_people(user)
+                meetings(user)
 
             return Response({'status': request.user.generaluser.status}, status=status.HTTP_201_CREATED)
 
