@@ -122,6 +122,8 @@ class ListUserStatusSerializer(serializers.ModelSerializer):
             return MinorPlaceDetailsSerializer(BusinessOwner.objects.get(pk=obj.effective_factor)).data
         if obj.type == 4:
             return 'Got better'
+        if obj.status == 5:
+            return 'Dead'
 
 
 class ListCreateMeetPeopleserializers(serializers.ModelSerializer):
@@ -132,11 +134,11 @@ class ListCreateMeetPeopleserializers(serializers.ModelSerializer):
     date = serializers.DateTimeField(
         source='date_created', format='%Y-%m-%d', read_only=True)
 
-    user = serializers.IntegerField(required=False, min_value=1)
+    email = serializers.EmailField(required=False)
 
     class Meta:
         model = MeetPeople
-        fields = ('user', 'user_1', 'user_2',
+        fields = ('email', 'user_1', 'user_2',
                   'status_user1', 'status_user2', 'date')
 
     def get_status_user1(self, obj):
@@ -157,6 +159,11 @@ class ListCreateMeetPeopleserializers(serializers.ModelSerializer):
         except:
             return 1
 
+    def validate_email(self, email):
+        if GeneralUser.objects.filter(user__email=email).exists():
+            return email
+        raise serializers.ValidationError('There is no user with this email.')
+
 
 class ListUserSerializer(MinorUserDetailsSerializer):
     national_code = serializers.ReadOnlyField(source='user.national_code')
@@ -171,13 +178,13 @@ class ListUserSerializer(MinorUserDetailsSerializer):
         try:
             return obj.userstatus_set.last().date_created.date()
         except:
-            return None
+            pass
 
 
 class ControlPatientsSerializer(ListUserSerializer):
     STATUS_CHOICES = (
         (2, 'Got better'),
-        (5, 'pass away')
+        (5, 'Pass away')
     )
     status = serializers.ChoiceField(choices=STATUS_CHOICES)
 

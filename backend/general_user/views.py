@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 from . import tasks
 
 
-def meetings(user):
+def meetings_hierarchy(user):
     if user.status == 4:
         meetings_place(user)
 
@@ -31,7 +31,7 @@ def meetings(user):
             if GeneralUser.objects.get(pk=person).status < user.status:
                 UserStatus.objects.create(
                     type=2, user_id=person, effective_factor=user.pk, status=user.status-1)
-                meetings(GeneralUser.objects.get(pk=person))
+                meetings_hierarchy(GeneralUser.objects.get(pk=person))
 
 
 class UserDetailsView(RetrieveUpdateAPIView):
@@ -89,7 +89,7 @@ class RecordLatestHealthStatusView(APIView):
             if request.user.generaluser.status <= health_status:
                 UserStatus.objects.create(
                     type=1, user=request.user.generaluser, status=health_status)
-                meetings(request.user.generaluser)
+                meetings_hierarchy(request.user.generaluser)
                 return Response({'status': request.user.generaluser.status}, status=status.HTTP_201_CREATED)
 
         return Response({'status': request.user.generaluser.status}, status=status.HTTP_200_OK)
@@ -116,13 +116,17 @@ class ListCreateMeetPeopleView(ListCreateAPIView):
     def post(self, request):
         serializer = ListCreateMeetPeopleserializers(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user_target = GeneralUser.objects.get(user=serializer.data['user'])
+        user_target = GeneralUser.objects.get(
+            user__email=serializer.data['email'])
+
+        if request.user.generaluser == user_target:
+            return Response({'message': 'You cannot register a meeting with yourself.'}, status=status.HTTP_400_BAD_REQUEST)
 
         queryset = self.get_queryset()
         if queryset:
             meetings = [(obj.user1, obj.user2) for obj in queryset]
             if (request.user.generaluser, user_target) in meetings:
-                return Response({'message': 'You have already saved this appointment.'}, status=status.HTTP_200_OK)
+                return Response({'message': 'You have already saved this meeting.'}, status=status.HTTP_200_OK)
             if (user_target, request.user.generaluser) in meetings:
                 return Response({'message': 'This meeting has already been saved.'}, status=status.HTTP_200_OK)
 
@@ -141,12 +145,12 @@ class ListCreateMeetPeopleView(ListCreateAPIView):
                     new_status = status1 - 1
                 else:
                     user = request.user.generaluser
-                    factor = serializer.data['user']
+                    factor = user_target.pk
                     new_status = status2 - 1
 
                 UserStatus.objects.create(
                     type=2, user=user, effective_factor=factor, status=new_status)
-                meetings(user)
+                meetings_hierarchy(user)
 
             return Response({'status': request.user.generaluser.status}, status=status.HTTP_201_CREATED)
 

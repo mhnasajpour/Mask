@@ -15,7 +15,7 @@ PLACE_STATUS_CHOICES = (
 class Place(models.Model):
     name = models.CharField(max_length=150, blank=True)
     city = models.CharField(max_length=150, blank=True)
-    zip_code = models.CharField(unique=True, max_length=10, blank=True)
+    zip_code = models.CharField(max_length=10, blank=True)
     address = models.TextField(max_length=500, blank=True)
 
     latitude = models.FloatField(null=True)
@@ -28,6 +28,8 @@ class Place(models.Model):
     def clean(self):
         if len(self.zip_code) != 10 or not self.zip_code.isnumeric():
             raise ValidationError('Zip code is invalid.')
+        if Place.objects.filter(zip_code=self.zip_code).exists():
+            raise ValidationError('Place with this Zip code already exists.')
 
 
 class BusinessOwner(models.Model):

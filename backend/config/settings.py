@@ -201,7 +201,7 @@ BUSINESS_USER = env('BUSINESS_USER')
 WHITEPLACE = env('WHITEPLACE')
 REDPLACE = env('REDPLACE')
 
-
+# TODO: remove it
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=20),

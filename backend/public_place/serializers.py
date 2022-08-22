@@ -19,7 +19,7 @@ class MinorPlaceDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = BusinessOwner
         fields = ('pk', 'email', 'name', 'city', 'zip_code',
-                  'address', 'latitude', 'longitude')
+                  'address', 'latitude', 'longitude', 'status')
 
 
 class ListCreateMeetPlaceSerializer(serializers.ModelSerializer):
@@ -35,8 +35,8 @@ class ListCreateMeetPlaceSerializer(serializers.ModelSerializer):
     def get_status_user(self, obj):
         try:
             return obj.user.userstatus_set \
-                .filter(date_created__gte=obj.date_created,
-                        date_created__lte=obj.date_created + timedelta(days=7)) \
+                .filter(date_created__gte=obj.date_created - timedelta(days=7),
+                        date_created__lte=obj.date_created) \
                 .last().status
         except:
             return 1
@@ -44,8 +44,8 @@ class ListCreateMeetPlaceSerializer(serializers.ModelSerializer):
     def get_status_place(self, obj):
         try:
             return obj.place.placestatus_set \
-                .filter(date_created__gte=obj.date_created,
-                        date_created__lte=obj.date_created + timedelta(days=7)) \
+                .filter(date_created__lte=obj.date_created,
+                        date_created__gte=obj.date_created - timedelta(days=14)) \
                 .last().status
         except:
             return WHITEPLACE

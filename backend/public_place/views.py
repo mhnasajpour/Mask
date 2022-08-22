@@ -10,7 +10,7 @@ from config.settings import WHITEPLACE, REDPLACE
 from django.db.models import Q
 from rest_framework.generics import ListCreateAPIView
 from django.db import transaction
-from general_user.models import UserStatus
+from general_user.models import GeneralUser, UserStatus
 
 
 def meetings_place(user):
@@ -55,12 +55,18 @@ class MeetPlaceStatisticsView(APIView):
     permission_classes = [IsQualified, IsPublicPlace]
 
     def get(self, request, day):
+        if day > 7:
+            return Response({'error': 'Day should be lower than 7.'}, status=status.HTTP_400_BAD_REQUEST)
+
         codes = [0] * 6
         meetings = request.user.businessowner.meetplace_set \
-            .filter(date_created__gt=datetime.now()-timedelta(days=day))
+            .filter(date_created__gt=datetime.now()-timedelta(days=day)).values_list('user', flat=True)
+        users = GeneralUser.objects.filter(pk__in=meetings)
 
-        for meet in meetings:
-            codes[meet.status_user] += 1
+        for user in users:
+            meet_status = user.userstatus_set \
+                .filter(date_created__gte=datetime.now()-timedelta(days=int(day)+7)).last().status
+            codes[meet_status] += 1
         codes.pop(0)
         return Response({'statistics': codes}, status=status.HTTP_200_OK)
 
@@ -81,14 +87,9 @@ class ListCreateMeetPlaceView(ListCreateAPIView):
 
         meetings = [obj.place for obj in self.get_queryset()]
         if place_target in meetings:
-            return Response({'message': 'You have already saved this appointment.'}, status=status.HTTP_200_OK)
+            return Response({'message': 'You have already saved this meeting.'}, status=status.HTTP_200_OK)
 
         with transaction.atomic():
-            meet_place = MeetPlace()
-            meet_place.user = user_target
-            meet_place.place = place_target
-            meet_place.save()
-
             status_user = user_target.status
             status_place = place_target.status
             if status_place == REDPLACE and status_user <= 2:
@@ -98,5 +99,10 @@ class ListCreateMeetPlaceView(ListCreateAPIView):
             elif status_place == WHITEPLACE and status_user == 4:
                 PlaceStatus.objects.create(
                     type=1, place=place_target, status=REDPLACE, effective_factor=user_target.pk)
+
+            meet_place = MeetPlace()
+            meet_place.user = user_target
+            meet_place.place = place_target
+            meet_place.save()
 
             return Response({'status': request.user.generaluser.status}, status=status.HTTP_201_CREATED)
