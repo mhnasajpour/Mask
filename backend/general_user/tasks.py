@@ -1,8 +1,8 @@
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from .models import GeneralUser, UserStatus
-from public_place.models import BusinessOwner, PlaceStatus
 from config.settings import WHITEPLACE, REDPLACE
+from public_place.models import BusinessOwner, PlaceStatus
 
 
 def update_status():

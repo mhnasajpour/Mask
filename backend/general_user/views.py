@@ -1,17 +1,24 @@
+from . import tasks
+from datetime import datetime, timedelta
+from django.db import transaction
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .serializers import GeneralUserSerializer, BusinessOwnerSerializer, RecordLatestHealthStatusSerializer, ListUserStatusSerializer, ListCreateMeetPeopleserializers, MinorUserDetailsSerializer, ListUserSerializer, ControlPatientsSerializer
 from rest_framework.views import APIView
-from .permissions import IsQualified, IsGeneralUser
 from rest_framework.response import Response
 from rest_framework import status
+from .permissions import IsQualified, IsGeneralUser
 from .models import GeneralUser, UserStatus, MeetPeople
-from datetime import datetime, timedelta
-from django.db.models import Q
+from .serializers import (GeneralUserSerializer,
+                          BusinessOwnerSerializer,
+                          RecordLatestHealthStatusSerializer,
+                          ListUserStatusSerializer,
+                          ListCreateMeetPeopleserializers,
+                          MinorUserDetailsSerializer,
+                          ListUserSerializer,
+                          ControlPatientsSerializer)
 from public_place.views import meetings_place
-from django.db import transaction
-from django.shortcuts import get_object_or_404
-from . import tasks
 
 
 def meetings_hierarchy(user):

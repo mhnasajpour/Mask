@@ -1,7 +1,6 @@
 from django.contrib import admin
-from .models import User, GeneralUser, UserStatus, MeetPeople, GENERAL_USER, BUSINESS_USER
 from django.utils.html import format_html
-from public_place.models import BusinessOwner
+from .models import User, GeneralUser, UserStatus, MeetPeople, GENERAL_USER, BUSINESS_USER
 
 
 class TypeFilter(admin.SimpleListFilter):

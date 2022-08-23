@@ -1,6 +1,6 @@
+from datetime import timedelta
 from rest_framework import serializers
 from .models import BusinessOwner, MeetPlace, WHITEPLACE, PLACE_STATUS_CHOICES
-from datetime import timedelta
 
 
 class ChangePlaceStatusSerializer(serializers.Serializer):

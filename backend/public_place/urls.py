@@ -1,5 +1,8 @@
 from django.urls import path
-from .views import ChangePlaceStatusView, MeetPlaceStatisticsView, MinorPlaceDetailsView, ListCreateMeetPlaceView
+from .views import (ChangePlaceStatusView,
+                    MeetPlaceStatisticsView,
+                    MinorPlaceDetailsView,
+                    ListCreateMeetPlaceView)
 
 urlpatterns = [
     path('', MinorPlaceDetailsView.as_view(), name='place'),

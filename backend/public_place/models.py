@@ -1,9 +1,9 @@
-from django.db import models
-from general_user.models import User, GeneralUser
-from config.settings import WHITEPLACE, REDPLACE
 import uuid
+from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
+from config.settings import WHITEPLACE, REDPLACE
+from general_user.models import User, GeneralUser
 
 
 PLACE_STATUS_CHOICES = (

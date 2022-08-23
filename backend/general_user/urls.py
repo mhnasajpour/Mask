@@ -1,5 +1,10 @@
 from django.urls import path
-from .views import UserDetailsView, RecordLatestHealthStatusView, ListUserStatusView, ListCreateMeetPeopleView, MinorPlaceDetailsView, StatisticsView, ListUserView
+from .views import (UserDetailsView,
+                    RecordLatestHealthStatusView,
+                    ListUserStatusView,
+                    ListCreateMeetPeopleView,
+                    MinorPlaceDetailsView,
+                    StatisticsView)
 
 urlpatterns = [
     path('', UserDetailsView.as_view(), name='user'),

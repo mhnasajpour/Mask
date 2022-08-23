@@ -1,10 +1,10 @@
+from django_reverse_admin import ReverseModelAdmin
 from django import forms
 from django.contrib import admin
-from .models import Place, BusinessOwner, PlaceStatus, MeetPlace, WHITEPLACE, REDPLACE
-from django_reverse_admin import ReverseModelAdmin
 from django.utils.html import format_html
-from general_user.models import GeneralUser
+from .models import Place, BusinessOwner, PlaceStatus, MeetPlace, WHITEPLACE, REDPLACE
 from config.settings import DOMAIN
+from general_user.models import GeneralUser
 
 
 @admin.register(Place)

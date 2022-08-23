@@ -1,16 +1,15 @@
-from rest_framework.views import APIView
-from general_user.permissions import IsGeneralUser, IsQualified, IsPublicPlace
-from rest_framework.generics import ListAPIView
-from rest_framework.response import Response
-from rest_framework import status
-from .serializers import ChangePlaceStatusSerializer, MinorPlaceDetailsSerializer, ListCreateMeetPlaceSerializer
-from .models import BusinessOwner, PlaceStatus, MeetPlace
 from datetime import datetime, timedelta
-from config.settings import WHITEPLACE, REDPLACE
-from django.db.models import Q
-from rest_framework.generics import ListCreateAPIView
 from django.db import transaction
+from django.db.models import Q
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView
+from rest_framework.response import Response
+from .models import BusinessOwner, PlaceStatus, MeetPlace
+from .serializers import ChangePlaceStatusSerializer, MinorPlaceDetailsSerializer, ListCreateMeetPlaceSerializer
+from config.settings import WHITEPLACE, REDPLACE
 from general_user.models import GeneralUser, UserStatus
+from general_user.permissions import IsGeneralUser, IsQualified, IsPublicPlace
 
 
 def meetings_place(user):

@@ -1,7 +1,7 @@
-from rest_framework import serializers
-from public_place.models import Place, BusinessOwner
-from .models import GeneralUser, UserStatus, MeetPeople
 from datetime import timedelta
+from rest_framework import serializers
+from .models import GeneralUser, UserStatus, MeetPeople
+from public_place.models import Place, BusinessOwner
 from public_place.serializers import MinorPlaceDetailsSerializer
 
 

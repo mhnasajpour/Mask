@@ -1,11 +1,11 @@
+import re
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from dj_rest_auth.serializers import LoginSerializer, PasswordResetSerializer
-from general_user.models import User, GeneralUser
+from .models import User, GeneralUser
 from public_place.models import BusinessOwner, Place
 from config.settings import GENERAL_USER, BUSINESS_USER
-from django.contrib.auth import get_user_model
-import re
 
 
 class CustomRegisterSerializer(RegisterSerializer):
