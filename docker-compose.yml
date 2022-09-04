@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./backend
+    ports:
+      - 8000:8000
+    command: ./docker-entrypoint.sh
+    volumes:
+      - ./backend:/code
+    depends_on:
+      - db
+
+  db:
+    image: postgres:alpine
+    volumes:
+      - app-data:/var/lib/postgresql/data
+    ports:
+      - 8080:5432
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+
+volumes:
+  app-data:
