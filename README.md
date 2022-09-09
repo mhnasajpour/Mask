@@ -19,15 +19,15 @@ pip install virtualenv
 python -m virtualenv venv
 venv\Scripts\activate
 
+cd backend
 pip install -r requirements.txt
 ```
 > Now you have to copy file in the same destination.
 ```
-xcopy backend\config\.env-sample backend\config\.env
+xcopy config\.env-sample config\.env
 ```
 > Go to path `backend\config\.env` and fill this file with your information.
 ```
-cd backend
 python manage.py migrate
 python manage.py runserver
 ```
