@@ -1,8 +1,6 @@
 # Mask
 MASK, a project to control covid-19 and reduce deaths and diseases caused by it.
 
->*Visit website:* **https://mhnasajpour.pythonanywhere.com/**
-
 ## 0. Introduction
 
 Mask has 3 type of accounts: ***Admin*** - ***General user*** - ***Business owner***.
